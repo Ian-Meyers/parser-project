@@ -1,0 +1,24 @@
+Steps on how to run this program
+
+Before we begin make sure you have:
+    Composer
+    Docker
+
+Inside terminal (or any similar application), open the parser-project folder and run:
+    build    --file .docker/Dockerfile    -t parser-project .
+    docker run --rm -p 8080:80 parser-project
+
+When you are done with the project:
+    docker rmi -f parser-project
+
+
+Inside the application:
+    Click upload a file
+    select a text file that contains the html and header of the email (can contain multiple)
+    select submit or select download html
+    if submit is selected, the application should display the following attributes for the emails in the file:
+        "FROM:","TO:","SUBJECT:","DATE:","MESSAGE-ID:"
+    if download html is selected, the application will download the html that would be displayed when "submit" is selected:
+        "FROM:","TO:","SUBJECT:","DATE:","MESSAGE-ID:"
+
+
