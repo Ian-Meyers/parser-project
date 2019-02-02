@@ -74,7 +74,7 @@
             <input type="submit" name="download" value="download html">
         </form>
         <pre>
-        <?php
+<?php
 
             // Email data set that I know about
             $emailNotes = [
@@ -105,11 +105,11 @@
 
             // This array is the values to display to the end user
             $displayValues = [
-                "\nTo:",
+            //    "\nTo:",
                 "\nFrom:",
                 "\nDate:",
-                "\nSubject:",
-                "\nMessage-ID:"
+                "\nSubject:"
+            //    "\nMessage-ID:"
             ];
 
         /**
@@ -121,7 +121,7 @@
          * @param array $emailNotes
          * @return string
          */
-            function findNeedle($Needle, $Haystack, $emailNotes = ["\nX-Vitals:", "\nMime-Version:", "\nReceived:","\nFrom:","\nTo:","\nSubject:","\nDate:","\nMessage-ID:","\nAcount no.:","\nMIME-Version:","\nX-Ninja-Mailer-ID:","\nX-LibVersion:","\nList-Unsubscribe:","\nx-idmail:","\nReply-To:","\nList-Unsubscribe:","\nContent-Type:","\nReturn-Path:","\nX-Original-To:","\nDelivered-To:","\nContent-Transfer-Encoding:","\nX-BBounce:", "\nX-campaignid:"]){
+            function findNeedle($Needle, $Haystack, $emailNotes = ["\n\n", "\nX-Vitals:", "\nMime-Version:", "\nReceived:","\nFrom:","\nTo:","\nSubject:","\nDate:","\nMessage-ID:","\nAcount no.:","\nMIME-Version:","\nX-Ninja-Mailer-ID:","\nX-LibVersion:","\nList-Unsubscribe:","\nx-idmail:","\nReply-To:","\nList-Unsubscribe:","\nContent-Type:","\nReturn-Path:","\nX-Original-To:","\nDelivered-To:","\nContent-Transfer-Encoding:","\nX-BBounce:", "\nX-campaignid:"]){
                 $explodedValue = explode($Needle, $Haystack);
 
 
@@ -181,7 +181,7 @@
 
 
                 // This breaks up all emails with a boundary code instead of html
-                $boundaryCodeLocationsArray = findWords("boundary=\"", $file, []);
+                $boundaryCodeLocationsArray = findWords("boundary=", $file, []);
                 $tempFile = $file;
 
                 $boundaryCodeArray = [];
@@ -200,6 +200,7 @@
                 }
 
                 foreach ($boundaryCodeArray as $boundaryCode) {
+                    $boundaryCode = str_replace("\"", "",  $boundaryCode);
                     $file = str_replace("--".$boundaryCode, "<html>", $file);
                 }
 
@@ -211,6 +212,8 @@
                     // this if statement is an attempt to discern the header of the
                     // email from the body of the array
                     if (strpos($sectionOfEmail, "X-Original-To:")) {
+                        $displayMessage = "";
+
                         $headersArray = [];
 
                         // this sorts the array of various email header subjects
@@ -238,12 +241,21 @@
                             // This is where you can store the value of the email.
                             // I went and displayed it because It was me doing something with it
                             if (in_array($subjectHeader, $displayValues)) {
-                                // echoing out the value
-                                echo $subjectHeader . " " . str_replace("<", "&lt;", $ToNeedle) ;
+
+                                // updating the needle so it can be displayed in html
+                                $displayNeedle = str_replace("\n", "", $ToNeedle);
+                                $displayNeedle = str_replace("<", "&lt;", $ToNeedle);
+
+                                // for pipe delimited message, the first value should not have a "|" in front of it
+                                if ($displayMessage == "") {
+                                    $displayMessage =   str_replace("\n", "", $subjectHeader) . " " .  $displayNeedle;
+                                } else {
+                                    $displayMessage =   $displayMessage . "|" . str_replace("\n", "", $subjectHeader) . " " .  $displayNeedle;
+                                }
                             }
                         }
-
-                        echo "<br/>";
+                        echo $displayMessage;
+                        echo "<br/><br/>";
                     }
                 }
 
